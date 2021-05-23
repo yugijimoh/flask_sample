@@ -32,15 +32,17 @@ def buildNodes(nodeRecord):  # 构建web显示节点
     data = {"id": nodeRecord._id, "label": list(nodeRecord._labels)[0]}  # 将集合元素变为list，然后取出值
     data.update(dict(nodeRecord._properties))
 
-    return {"data": data}
+    #return {"data": data}
+    return data
 
 
 def buildEdges(relationRecord):  # 构建web显示边
     data = {"source": relationRecord.start_node._id,
             "target": relationRecord.end_node._id,
             "relationship": relationRecord.type}
+    #return {"data": data}
+    return data
 
-    return {"data": data}
 
 @app.route('/graph')
 def get_graph():
@@ -54,6 +56,7 @@ def get_graph():
             'MATCH (p1{name:"Laurence Fishburne"})-[r1:ACTED_IN]->(m)<-[r2:DIRECTED]-(p2)  RETURN p1,m,p2,r1,r2').values()
         nodeList = []
         edgeList = []
+        categoryList = []
         for result in results:
             nodeList.append(result[0])
             nodeList.append(result[1])
@@ -64,7 +67,9 @@ def get_graph():
 
         nodes = list(map(buildNodes, nodeList))
         edges = list(map(buildEdges, edgeList))
-    return jsonify(elements={"nodes": nodes, "edges": edges})
+        categoryList=[{"label":"Movie"},{"label":"Person"}]
+        logger.warning(categoryList)
+    return jsonify(elements={"nodes": nodes, "edges": edges, "categories":categoryList})
 
 @app.route('/')
 def hello_world():
